@@ -36,6 +36,11 @@ download_from_repositories() {
 	download_from_repository "atmosphere" "$atmosphere_repository" && download_from_repository "hekate" "$hekate_repository"
 }
 
+download_sigpatches() {
+	local url=$(curl -s https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/ | grep -o 'https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/?.*"' | tr -d '"')
+	curl -s -L "$url" --create-dirs -o "./$DOWNLOADS_DIR/sigpatches.zip"
+}
+
 update() {
 	local path="$1"
 
@@ -74,6 +79,7 @@ main() {
 	local hekate_repository=$(curl -s https://api.github.com/repos/CTCaer/hekate/releases/latest)
 
 	# Downloads.
+	download_sigpatches
 	download_from_repositories "$atmosphere_repository" "$hekate_repository"
 
 	echo -n "Updating..."
