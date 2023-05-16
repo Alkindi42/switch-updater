@@ -2,6 +2,12 @@
 
 DOWNLOADS_DIR="downloads"
 
+declare -a REQUIRED_BINARIES=(
+	'jq'
+	'curl'
+	'rsync'
+)
+
 declare -A FILES=(
 	["atmosphere"]="fusee.bin|atmosphere.*.zip"
 	["hekate"]="hekate_ctcaer_.*.zip"
@@ -85,6 +91,13 @@ update() {
 }
 
 main() {
+	for binary in "${REQUIRED_BINARIES[@]}"; do
+		if ! command -v "$binary" &>/dev/null; then
+			echo "binary $binary does not exist"
+			return 1
+		fi
+	done
+
 	local volume_path="$1"
 	local atmosphere_repository=$(curl -s https://api.github.com/repos/Atmosphere-NX/Atmosphere/releases/latest)
 	local hekate_repository=$(curl -s https://api.github.com/repos/CTCaer/hekate/releases/latest)
