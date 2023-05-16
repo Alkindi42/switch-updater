@@ -17,22 +17,20 @@ I have created a script that automate the update.
 Example from my laptop (I'm using OS X) :
 
 ```bash
-bash update.sh /Volumes/Nintendo-switch
+./main.sh /Volumes/Switch
+```
+
+or
+
+```bash
+bash main.sh /Volumes/Switch
 ```
 
 # How it works?
 
-1. The script creates a backup of your micro SD card.
-2. The script checks if you really need an update (version comparison).
-3. The script replaces the necessary files in your micro SD card (it does not touch other files).
-4. That's all.
+1. The script creates a backup of your micro SD card (if you don't already have one).
+2. The script replaces the necessary files in your micro SD card (it does not touch other files).
+3. That's all.
 
-# How to rollback?
-The script created a mess? Do not worry, there is a command to rollback.
-```
-bask update.sh rollback
-```
-
-The script will copy your backup to your micro SD card as if you had never run this script.
-
-If you have a problem, feel free to create an issue or create a PR.
+# Backup
+Backup can take a long time, it depends on your micro SD card and data size. It might be interesting to only backup files that we know the script will overwrite. To be honest, I never use the backup feature so I don't want to improve it, especially because I know no one else will use this script. So who am I talking to? I don't know but if you want something feel free to open an issue or PR.
