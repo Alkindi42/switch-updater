@@ -7,6 +7,17 @@ declare -A FILES=(
 	["hekate"]="hekate_ctcaer_.*.zip"
 )
 
+# Create a backup if we don't already have one.
+backup() {
+	local volume_path="$1"
+	local backup_name="$(basename "$volume_path").backup"
+
+	if [[ ! -d "./$backup_name" ]]; then
+		echo "Create backup $backup_name"
+		rsync -azh --progress --verbose "$volume_path/" "$backup_name"
+	fi
+}
+
 # Download from repository.
 download_from_repository() {
 	local name="$1"
@@ -81,6 +92,9 @@ main() {
 	# Downloads.
 	download_sigpatches
 	download_from_repositories "$atmosphere_repository" "$hekate_repository"
+
+	# Create a backup if you don't already have one.
+	backup "$volume_path"
 
 	echo -n "Updating..."
 	update "$volume_path"
