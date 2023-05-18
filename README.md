@@ -6,7 +6,7 @@ When Nintendo updates its Firmware, I have to do some updates on my side to cont
 
 * [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
 * [Hekate](https://github.com/CTCaer/hekate)
-* [Sigpatches](https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/)
+* [Sigpatches](https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/) or [here](https://sigmapatches.coomer.party/)
 
 I have created a script that automate the update.
 
@@ -17,6 +17,8 @@ I have created a script that automate the update.
 * [curl](https://everything.curl.dev/get)
 * [jq](https://stedolan.github.io/jq/)
 * [rsync](https://doc.ubuntu-fr.org/rsync)
+
+## Steps
 
 1. Connect your micro SD card to your computer.
 2. Run the script to update. It needs the path to your micro SD card.
