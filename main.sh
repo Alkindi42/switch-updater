@@ -54,7 +54,7 @@ download_from_repositories() {
 }
 
 download_sigpatches() {
-	local url=$(curl -s https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/ | grep -o 'https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/?.*"' | tr -d '"')
+	local url=$(curl -s https://hackintendo.com/download/sigpatches/ | grep -o 'data-downloadurl=".*"' | grep -o "https://.*" | tr -d '"')
 	curl -s -L "$url" --create-dirs -o "./$DOWNLOADS_DIR/sigpatches.zip"
 }
 
@@ -64,7 +64,6 @@ update() {
 	# If necessary unzip the zips.
 	for file in $(ls $DOWNLOADS_DIR/*.zip); do
 		local directory="${file%.zip}"
-
 		if [[ ! -d "$directory" ]]; then
 			unzip -n -d "$directory" "$file"
 		fi
@@ -74,6 +73,7 @@ update() {
 	for file in $(ls $DOWNLOADS_DIR/*.zip); do
 		local directory="${file%.zip}"
 
+		echo -n "Updating $directory..."
 		if [[ "$directory" == *atmosphere* ]]; then
 			rsync -a $directory/atmosphere/* "$path/atmosphere/"
 			rsync "$directory/hbmenu.nro" "$path/"
@@ -85,6 +85,8 @@ update() {
 			rsync -a $directory/atmosphere/* "$path/atmosphere/"
 			rsync -a $directory/bootloader/* "$path/bootloader/"
 		fi
+		echo "done."
+
 	done
 
 	rsync "$DOWNLOADS_DIR/fusee.bin" "$path/atmosphere/"
@@ -109,7 +111,6 @@ main() {
 	# Create a backup if you don't already have one.
 	backup "$volume_path"
 
-	echo -n "Updating..."
 	update "$volume_path"
 
 	if [[ "$?" -eq 0 ]]; then
