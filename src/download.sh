@@ -7,7 +7,7 @@ DOWNLOADS_DIR="$ROOT_DIR/downloads"
 VERSIONS_FILE="$DOWNLOADS_DIR/versions.env"
 
 declare -A FILES=(
-  ["syspatch"]="sys-patch-.*.zip"
+  ["sys-patch"]="sys-patch-.*.zip"
   ["atmosphere"]="fusee.bin|atmosphere.*.zip"
   ["hekate"]="hekate_ctcaer_.*.zip"
 )
@@ -25,7 +25,7 @@ downloads() {
 
   download_from_github_repository "atmosphere" "$atmosphere_json" || return 1
   download_from_github_repository "hekate" "$hekate_json" || return 1
-  download_from_github_repository "syspatch" "$syspatch_json" || return 1
+  download_from_github_repository "sys-patch" "$syspatch_json" || return 1
 }
 
 get_current_version() {
@@ -36,7 +36,7 @@ get_current_version() {
   case "$name" in
   atmosphere) echo "${ATMOSPHERE_VERSION:-}" ;;
   hekate) echo "${HEKATE_VERSION:-}" ;;
-  syspatch) echo "${SYSPATCH_VERSION:-}" ;;
+  sys-patch) echo "${SYSPATCH_VERSION:-}" ;;
   esac
 }
 
@@ -49,7 +49,7 @@ save_version() {
   case "$name" in
   atmosphere) ATMOSPHERE_VERSION="$version" ;;
   hekate) HEKATE_VERSION="$version" ;;
-  syspatch) SYSPATCH_VERSION="$version" ;;
+  sys-patch) SYSPATCH_VERSION="$version" ;;
   esac
 
   cat >"$VERSIONS_FILE" <<EOF
@@ -68,7 +68,7 @@ download_from_github_repository() {
   local current_version
   local downloaded=false
 
-  html_url="$(jq -r ".html_url" <<<"$repository")"
+  html_url="$(jq -r ".html_url // empty" <<<"$repository")"
 
   if [[ -z "$html_url" ]]; then
     printf "Invalid GitHub release JSON for %s\n" "$name" >&2
@@ -79,7 +79,7 @@ download_from_github_repository() {
   current_version="$(get_current_version "$name")"
 
   if [[ "$tag" == "$current_version" ]]; then
-    printf "%s already up to date (%s)\n" "$name" "$tag"
+    printf "  ✓ %s %s already downloaded\n" "$name" "$tag"
     return 0
   fi
 
@@ -88,17 +88,21 @@ download_from_github_repository() {
     local url
     local output_path
 
-    asset_name="$(jq -r '.name' <<<"$row")"
-    url="$(jq -r '.browser_download_url' <<<"$row")"
+    asset_name="$(jq -r '.name // empty' <<<"$row")"
+    url="$(jq -r '.browser_download_url // empty' <<<"$row")"
+
+    if [[ -z "$asset_name" || -z "$url" ]]; then
+      continue
+    fi
+
     output_path="$DOWNLOADS_DIR/$asset_name"
 
     if [[ "$asset_name" =~ ${FILES[$name]} ]]; then
-      printf "Downloading %s..." "$asset_name"
       if curl -fsSL "$url" --create-dirs -o "$output_path"; then
-        printf '✔\n'
+        printf "  ✓ %s\n" "$asset_name"
         downloaded=true
       else
-        printf '✘\n'
+        printf "  ✘ %s\n" "$asset_name" >&2
         return 1
       fi
     fi
@@ -110,5 +114,4 @@ download_from_github_repository() {
     printf "No asset found for %s\n" "$name" >&2
     return 1
   fi
-
 }
