@@ -9,7 +9,7 @@ VERSIONS_FILE="$DOWNLOADS_DIR/versions.env"
 declare -A FILES=(
   ["syspatch"]="sys-patch-.*.zip"
   ["atmosphere"]="fusee.bin|atmosphere.*.zip"
-  ["hekate"]="hekate_ctcaer_.*.zip|hekate_ctcaer_.*[0-9].bin"
+  ["hekate"]="hekate_ctcaer_.*.zip"
 )
 
 downloads() {
@@ -23,9 +23,9 @@ downloads() {
   syspatch_json="$(curl -fsSL https://api.github.com/repos/impeeza/sys-patch/releases/latest)" || return 1
   atmosphere_json="$(curl -fsSL https://api.github.com/repos/Atmosphere-NX/Atmosphere/releases/latest)" || return 1
 
-  download_from_github_repository "atmosphere" "$atmosphere_json"
-  download_from_github_repository "hekate" "$hekate_json"
-  download_from_github_repository "syspatch" "$syspatch_json"
+  download_from_github_repository "atmosphere" "$atmosphere_json" || return 1
+  download_from_github_repository "hekate" "$hekate_json" || return 1
+  download_from_github_repository "syspatch" "$syspatch_json" || return 1
 }
 
 get_current_version() {
@@ -69,8 +69,13 @@ download_from_github_repository() {
   local downloaded=false
 
   html_url="$(jq -r ".html_url" <<<"$repository")"
-  tag="${html_url##*/}"
 
+  if [[ -z "$html_url" ]]; then
+    printf "Invalid GitHub release JSON for %s\n" "$name" >&2
+    return 1
+  fi
+
+  tag="${html_url##*/}"
   current_version="$(get_current_version "$name")"
 
   if [[ "$tag" == "$current_version" ]]; then
@@ -97,12 +102,12 @@ download_from_github_repository() {
         return 1
       fi
     fi
-  done < <(jq -r -c '.assets[]' <<<"$repository")
+  done < <(jq -r -c '.assets[]?' <<<"$repository")
 
   if [[ "$downloaded" == true ]]; then
     save_version "$name" "$tag"
   else
-    printf "No asset found for %s\n" "$name"
+    printf "No asset found for %s\n" "$name" >&2
     return 1
   fi
 
