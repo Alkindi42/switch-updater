@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
-DOWNLOADS_DIR="$SCRIPT_DIR/downloads"
+DOWNLOADS_DIR="$ROOT_DIR/downloads"
 VERSIONS_FILE="$DOWNLOADS_DIR/versions.env"
 
 declare -A FILES=(
@@ -84,7 +85,7 @@ download_from_github_repository() {
 
     asset_name="$(jq -r '.name' <<<"$row")"
     url="$(jq -r '.browser_download_url' <<<"$row")"
-    output_path="./$DOWNLOADS_DIR/$asset_name"
+    output_path="$DOWNLOADS_DIR/$asset_name"
 
     if [[ "$asset_name" =~ ${FILES[$name]} ]]; then
       printf "Downloading %s..." "$asset_name"
@@ -106,5 +107,3 @@ download_from_github_repository() {
   fi
 
 }
-
-downloads
