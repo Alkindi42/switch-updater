@@ -28,6 +28,16 @@ Connect your Nintendo Switch microSD card to your computer, then run:
 ./main.sh /path/to/sd-card
 ```
 
+# Using Hekate USB Mass Storage
+
+You can also update the SD card without removing it from the console by using Hekate USB Mass Storage.
+
+Boot into Hekate, mount the SD card from `Tools > USB Tools`, then run:
+
+```bash
+./main.sh /Volumes/Switch
+```
+
 # What it does
 
 The script performs the following steps:
