@@ -1,46 +1,103 @@
 # Switch updater
 
-I have a hacked Nintendo Switch.
+A small Bash script to update the main files used on my hacked Nintendo Switch SD card.
 
-When Nintendo updates its Firmware, I have to do some updates on my side to continue enjoying my console:
+It currently handles:
 
 * [Atmosphere](https://github.com/Atmosphere-NX/Atmosphere)
 * [Hekate](https://github.com/CTCaer/hekate)
-* [Sigpatches](https://hackintendo.com/download/sigpatches-atmosphere-esfsloader/) or [here](https://sigmapatches.coomer.party/)
+* [sys-patch](https://github.com/impeeza/sys-patch)
 
-I have created a script that automate the update.
+The script downloads the latest GitHub releases, creates a backup of the current SD card files, then copies the updated files to the SD card.
 
-# Getting started.
+# Getting started
 
-## Dependencies
-* bash > 4.0
+## Requirements
+
+* bash 4+
 * [curl](https://everything.curl.dev/get)
 * [jq](https://stedolan.github.io/jq/)
 * [rsync](https://doc.ubuntu-fr.org/rsync)
+* unzip
 
-## Steps
+## Usage
 
-1. Connect your micro SD card to your computer.
-2. Run the script to update. It needs the path to your micro SD card.
-
-Example from my laptop (I'm using OS X) :
+Connect your Nintendo Switch microSD card to your computer, then run:
 
 ```bash
-./main.sh /Volumes/Switch
+./main.sh /path/to/sd-card
 ```
 
-or
+# What it does
+
+The script performs the following steps:
+
+1. Checks that all required binaries are installed.
+2. Downloads the latest releases for Atmosphere, Hekate and sys-patch.
+3. Stores downloaded files in the `downloads/` directory.
+4. Tracks downloaded versions in `downloads/versions.env`.
+5. Creates a backup of important SD card files in `backups/`.
+6. Extracts downloaded archives when needed.
+7. Copies the updated files to the SD card.
+
+# Example output
 
 ```bash
-bash main.sh /Volumes/Switch
+→ Destination: /Volumes/Switch
+
+Checking releases...
+  ✓ atmosphere 1.11.1 already downloaded
+  ✓ hekate v6.5.2 already downloaded
+  ✓ sys-patch v1.6.2.0 already downloaded
+
+Backup...
+  ✓ backup created: /path/to/project/backups/sd-card-2026-05-19
+
+Updating SD card...
+  ✓ atmosphere
+  ✓ hekate
+  ✓ sys-patch
+  ✓ fusee.bin
+
+Done.
 ```
-
-# How it works?
-
-1. The script creates a backup of your micro SD card (if you don't already have one).
-2. The script downloads all the necessary files in `./downloads' directory.
-3. The script replaces the necessary files in your micro SD card (it does not touch other files).
-4. That's all.
 
 # Backup
-Backup can take a long time, it depends on your micro SD card and data size. It might be interesting to only backup files that we know the script will overwrite. To be honest, I never use the backup feature so I don't want to improve it, especially because I know no one else will use this script. So who am I talking to? I don't know but if you want something feel free to open an issue or PR.
+
+Before updating the SD card, the script creates a backup of the files and directories it may overwrite.
+
+Backups are stored in:
+
+```text
+backups/
+```
+
+A backup is created once per day using the following format:
+
+```text
+sd-card-YYYY-MM-DD
+```
+
+If a backup already exists for the current day, the script reuses it and does not create another one.
+
+# Downloads and version tracking
+
+Downloaded files are stored in:
+
+```text
+downloads/
+```
+
+The script keeps track of downloaded versions in:
+
+```text
+downloads/versions.env
+```
+
+If a release has already been downloaded, the script skips downloading it again.
+
+# Notes
+
+This project is mostly made for my own setup.
+
+It assumes a fairly standard Atmosphere/Hekate/sys-patch SD card layout. It only copies the files it manages and does not intentionally touch unrelated files on the SD card.
