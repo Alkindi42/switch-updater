@@ -25,7 +25,7 @@ The script downloads the latest GitHub releases, creates a backup of the current
 Connect your Nintendo Switch microSD card to your computer, then run:
 
 ```bash
-./main.sh /path/to/sd-card
+./switch-updater.sh /path/to/sd-card
 ```
 
 # Using Hekate USB Mass Storage
@@ -35,7 +35,7 @@ You can also update the SD card without removing it from the console by using He
 Boot into Hekate, mount the SD card from `Tools > USB Tools`, then run:
 
 ```bash
-./main.sh /Volumes/Switch
+./switch-updater.sh /Volumes/Switch
 ```
 
 # What it does
